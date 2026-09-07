@@ -242,7 +242,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 20px;
+  padding: 30px 20px 80px;
   text-align: center;
   position: relative;
 }
@@ -276,14 +276,17 @@ body {
 .ring-right { right: 0; top: 50%; transform: translateY(-50%); }
 .ring-joined { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; }
 
-/* ===== Kiss Animation ===== */
-.kiss-scene { position: relative; width: 200px; height: 150px; margin: 20px auto; }
-.kiss-char { position: absolute; font-size: 60px; transition: all 0.8s ease; }
-.kiss-left { left: 20px; bottom: 20px; }
-.kiss-right { right: 20px; bottom: 20px; }
-.kiss-heart { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%) scale(0); font-size: 30px; transition: all 0.5s ease 0.8s; }
-.kiss-active .kiss-left { left: 70px; }
-.kiss-active .kiss-right { right: 70px; }
+/* ===== Kiss Animation - FACING EACH OTHER ===== */
+.kiss-scene { position: relative; width: 220px; height: 160px; margin: 20px auto; }
+.kiss-char { position: absolute; font-size: 60px; transition: all 0.8s ease; bottom: 20px; }
+/* Left char faces right (normal) */
+.kiss-left { left: 15px; }
+/* Right char faces left (mirrored) */
+.kiss-right { right: 15px; transform: scaleX(-1); }
+.kiss-heart { position: absolute; left: 50%; top: 20%; transform: translate(-50%, -50%) scale(0); font-size: 40px; transition: all 0.5s ease 0.8s; }
+/* Move toward center to kiss */
+.kiss-active .kiss-left { left: 65px; }
+.kiss-active .kiss-right { right: 65px; }
 .kiss-active .kiss-heart { transform: translate(-50%, -50%) scale(1.5); animation: heartbeat 1s ease infinite; }
 
 /* ===== Blessings Section ===== */
@@ -370,6 +373,86 @@ body {
 }
 .gift-item.selected .gift-selected-tag { display: block; }
 
+/* ===== Share Section ===== */
+.share-section {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  max-width: 340px;
+  margin: 20px auto;
+  text-align: center;
+}
+.share-title { font-size: 18px; font-weight: 700; color: #5a3e4a; margin-bottom: 12px; }
+.share-friend-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ffdde5;
+  border-radius: 12px;
+  font-size: 15px;
+  text-align: center;
+  margin-bottom: 12px;
+  outline: none;
+}
+.share-friend-input:focus { border-color: #ff9a9e; }
+.share-card {
+  background: linear-gradient(135deg, #fff5f7 0%, #ffe4ec 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 12px 0;
+  text-align: center;
+  border: 2px dashed #ff9a9e;
+}
+.share-card-emoji { font-size: 50px; margin-bottom: 8px; }
+.share-card-text { font-size: 14px; color: #5a3e4a; line-height: 1.6; }
+.share-card-names { font-size: 16px; font-weight: 700; color: #ff6b81; margin: 8px 0; }
+.share-tip { font-size: 12px; color: #999; margin-top: 8px; }
+.share-btn-wechat {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #07C160 0%, #05a350 100%);
+  color: white;
+  border: none;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(7,193,96,0.3);
+  margin: 8px;
+}
+.share-btn-copy {
+  padding: 12px 32px;
+  background: #f0f0f0;
+  color: #666;
+  border: none;
+  border-radius: 24px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 8px;
+}
+
+/* ===== WeChat Tip Overlay ===== */
+.wechat-tip {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+  z-index: 500;
+  animation: fadeIn 0.3s ease;
+}
+.wechat-tip.show { display: block; }
+.wechat-tip-arrow {
+  position: absolute;
+  top: 10px; right: 20px;
+  font-size: 40px;
+  animation: bounce 1s infinite;
+}
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
 /* ===== Progress Bar ===== */
 .progress-container {
   position: fixed;
@@ -416,20 +499,6 @@ body {
   margin-top: 12px;
 }
 
-/* ===== Result Card ===== */
-.result-card {
-  background: white;
-  border-radius: 20px;
-  padding: 30px;
-  text-align: center;
-  box-shadow: 0 8px 30px rgba(255,154,158,0.2);
-  max-width: 340px;
-  margin: 20px auto;
-  animation: fadeInUp 0.6s ease;
-}
-.result-title { font-size: 22px; font-weight: 700; color: #5a3e4a; margin-bottom: 8px; }
-.result-subtitle { font-size: 14px; color: #8b6f7a; margin-bottom: 20px; }
-
 /* ===== Bouquet ===== */
 .bouquet { font-size: 60px; cursor: pointer; transition: transform 0.3s; display: inline-block; }
 .bouquet:hover { transform: scale(1.1); }
@@ -475,6 +544,13 @@ body {
 <body>
 
 <div class="petal-container" id="petalContainer"></div>
+
+<!-- WeChat Share Tip -->
+<div class="wechat-tip" id="wechatTip" onclick="this.classList.remove('show')">
+  <div class="wechat-tip-arrow">👆</div>
+  <div style="font-size:18px;font-weight:700;margin-bottom:12px;">点击右上角菜单</div>
+  <div style="font-size:14px;opacity:0.9;">选择「发送给朋友」或「分享到朋友圈」<br>把这份幸福传递给更多人 💕</div>
+</div>
 
 <div class="app-container">
   <!-- Header -->
@@ -561,6 +637,14 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== Scene Characters (different outfits per scene) =====
+const sceneChars = {
+  church: { bride: '👰‍♀️', groom: '🤵‍♂️', labelB: '新娘', labelG: '新郎' },
+  garden: { bride: '👰‍♀️', groom: '🤵‍♂️', labelB: '新娘', labelG: '新郎' },
+  island: { bride: '👰‍♀️', groom: '🤵‍♂️', labelB: '新娘', labelG: '新郎' },
+  chinese: { bride: '👰', groom: '👲', labelB: '新娘', labelG: '新郎' }
+};
+
 // ===== Data =====
 const scenes = {
   church: { name: '神圣教堂', emoji: '⛪', bg: 'bg-church', intro: '在庄严的教堂里，神圣的钟声回荡，阳光透过彩窗洒落，见证这一神圣时刻。', decorations: ['✨', '🕯️', '🌹', '✝️'] },
@@ -595,22 +679,32 @@ const blessings = {
   ]
 };
 
+// ===== Gifts: Traditional + Trendy =====
 const gifts = [
+  // Traditional
   { emoji: '🌹', name: '99朵玫瑰', price: '¥299' },
   { emoji: '💍', name: '情侣对戒', price: '¥1999' },
-  { emoji: '🍫', name: '手工巧克力', price: '¥128' },
-  { emoji: '📿', name: '定制项链', price: '¥899' },
   { emoji: '🍰', name: '纪念日蛋糕', price: '¥268' },
-  { emoji: '📸', name: '情侣写真', price: '¥1588' },
-  { emoji: '🎁', name: '惊喜礼盒', price: '¥520' },
+  // Trendy / 潮玩 (expensive, fun to pretend-buy)
+  { emoji: '🧸', name: 'Labubu隐藏款', price: '¥1299' },
+  { emoji: '🎎', name: '限量手办', price: '¥2999' },
+  { emoji: '🧸', name: '毛绒大娃', price: '¥899' },
+  { emoji: '🎨', name: '艺术家联名', price: '¥1599' },
+  { emoji: '🔮', name: '水晶球音乐盒', price: '¥699' },
+  { emoji: '👟', name: '联名球鞋', price: '¥1899' },
+  { emoji: '🎮', name: '限量游戏机', price: '¥3999' },
+  { emoji: '📱', name: '潮牌手机壳', price: '¥399' },
   { emoji: '✈️', name: '浪漫旅行', price: '¥3999' }
 ];
 
 // ===== State =====
-let state = { brideName: '', groomName: '', scene: null, step: 0, totalSteps: 7, selectedGifts: [] };
+let state = { brideName: '', groomName: '', scene: null, step: 0, totalSteps: 7, selectedGifts: [], shareFriend: '' };
+let isWeChat = false;
 
-// ===== Init: Check if already married =====
+// ===== Init =====
 function init() {
+  isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+  
   const saved = localStorage.getItem('weddingData');
   if (saved) {
     const data = JSON.parse(saved);
@@ -619,7 +713,6 @@ function init() {
     const days = Math.floor((today - weddingDate) / (1000 * 60 * 60 * 24));
     
     if (days >= 0) {
-      // Show anniversary banner
       let anniversaryMsg = '';
       const years = Math.floor(days / 365);
       if (years > 0) {
@@ -635,7 +728,6 @@ function init() {
         </div>
       `;
       
-      // Pre-fill names
       if (data.brideName) document.getElementById('brideName').value = data.brideName;
       if (data.groomName) document.getElementById('groomName').value = data.groomName;
     }
@@ -644,7 +736,6 @@ function init() {
   createPetals();
 }
 
-// ===== Petal Animation =====
 function createPetals() {
   const container = document.getElementById('petalContainer');
   const petals = ['🌸', '🌺', '🌹', '💮', '🏵️', '💐'];
@@ -669,7 +760,6 @@ function checkReady() {
   document.getElementById('startBtn').disabled = !ready;
 }
 
-// ===== Scene Selection =====
 function selectScene(el) {
   document.querySelectorAll('.scene-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
@@ -677,7 +767,6 @@ function selectScene(el) {
   checkReady();
 }
 
-// Input listeners
 document.getElementById('brideName').addEventListener('input', checkReady);
 document.getElementById('groomName').addEventListener('input', checkReady);
 
@@ -698,6 +787,8 @@ function startWedding() {
 function exitWedding() {
   document.getElementById('ceremonyScreen').classList.remove('active');
   state.step = 0;
+  state.selectedGifts = [];
+  state.shareFriend = '';
 }
 
 // ===== Progress =====
@@ -728,11 +819,12 @@ function runStep(step) {
 
 // Step 1: Entrance
 function renderEntrance(stage, scene) {
+  const chars = sceneChars[state.scene];
   stage.innerHTML = `
     <div class="ceremony-emoji">${scene.emoji}</div>
     <div class="ceremony-title">欢迎参加这场浪漫婚礼</div>
     <div class="ceremony-text">${scene.intro}</div>
-    <div style="font-size:60px;margin:16px 0;">👰‍♀️ ❤️ 🤵‍♂️</div>
+    <div style="font-size:60px;margin:16px 0;">${chars.bride} ❤️ ${chars.groom}</div>
     <div style="font-size:18px;font-weight:700;color:#5a3e4a;margin-bottom:24px;">${state.brideName} & ${state.groomName}</div>
     <button class="action-btn" onclick="runStep(1)">🎵 新人入场</button>
   `;
@@ -742,18 +834,19 @@ function renderEntrance(stage, scene) {
 // Step 2: Vows
 function renderVows(stage, scene) {
   const vow = vows[Math.floor(Math.random() * vows.length)];
+  const chars = sceneChars[state.scene];
   stage.innerHTML = `
     <div class="ceremony-emoji">💌</div>
     <div class="ceremony-title">宣读爱的誓言</div>
     <div style="display:flex;align-items:center;gap:12px;margin:16px 0;width:100%;max-width:360px;">
-      <span style="font-size:40px;">👰‍♀️</span>
+      <span style="font-size:40px;">${chars.bride}</span>
       <div class="vow-area" style="flex:1;margin:0;">
         <div class="vow-label">${state.brideName} 的誓言</div>
         <div class="vow-text">${vow.bride}</div>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin:16px 0;width:100%;max-width:360px;">
-      <span style="font-size:40px;">🤵‍♂️</span>
+      <span style="font-size:40px;">${chars.groom}</span>
       <div class="vow-area" style="flex:1;margin:0;">
         <div class="vow-label">${state.groomName} 的誓言</div>
         <div class="vow-text">${vow.groom}</div>
@@ -765,10 +858,12 @@ function renderVows(stage, scene) {
 
 // Step 3: Rings
 function renderRings(stage, scene) {
+  const chars = sceneChars[state.scene];
   stage.innerHTML = `
     <div class="ceremony-emoji">💍</div>
     <div class="ceremony-title">交换爱的信物</div>
     <div class="ceremony-text">戒指是圆的，没有起点也没有终点，象征永恒的爱。</div>
+    <div style="font-size:50px;margin:12px 0;">${chars.bride} 💍 ${chars.groom}</div>
     <div class="ring-container" id="ringContainer">
       <div class="ring ring-left" id="ringLeft">💍</div>
       <div class="ring ring-right" id="ringRight">💍</div>
@@ -786,16 +881,17 @@ function exchangeRings() {
   setTimeout(() => runStep(3), 2000);
 }
 
-// Step 4: Kiss
+// Step 4: Kiss - FACING EACH OTHER
 function renderKiss(stage, scene) {
+  const chars = sceneChars[state.scene];
   stage.innerHTML = `
     <div class="ceremony-emoji">💋</div>
     <div class="ceremony-title">见证幸福时刻</div>
     <div class="ceremony-text">在所有亲友的见证下，新郎可以亲吻你的新娘了！</div>
     <div class="kiss-scene" id="kissScene">
       <div class="kiss-heart">💖</div>
-      <div class="kiss-char kiss-left">👰‍♀️</div>
-      <div class="kiss-char kiss-right">🤵‍♂️</div>
+      <div class="kiss-char kiss-left">${chars.bride}</div>
+      <div class="kiss-char kiss-right">${chars.groom}</div>
     </div>
     <button class="action-btn" id="kissBtn" onclick="doKiss()">💋 深情拥吻</button>
   `;
@@ -809,7 +905,7 @@ function doKiss() {
   setTimeout(() => runStep(4), 3000);
 }
 
-// Step 5: Blessings (3 categories)
+// Step 5: Blessings
 function renderBlessings(stage, scene) {
   const family = blessings.family[Math.floor(Math.random() * blessings.family.length)];
   const friend = blessings.friends[Math.floor(Math.random() * blessings.friends.length)];
@@ -819,7 +915,6 @@ function renderBlessings(stage, scene) {
     <div class="ceremony-emoji">🎤</div>
     <div class="ceremony-title">亲友祝福环节</div>
     <div class="ceremony-text">在这个特别的时刻，听听家人和朋友最真挚的祝福。</div>
-
     <div class="blessing-categories">
       <div class="blessing-category">
         <div class="blessing-cat-title">👨‍👩‍👧 家人祝福</div>
@@ -837,13 +932,12 @@ function renderBlessings(stage, scene) {
         <div class="blessing-from">${guest.from}</div>
       </div>
     </div>
-
     <button class="action-btn" onclick="runStep(5)">💐 继续 — 抛捧花</button>
   `;
   createConfetti(['🎊', '💐', '🌸', '✨']);
 }
 
-// Step 6: Bouquet
+// Step 6: Bouquet + WeChat Share
 function renderBouquet(stage, scene) {
   stage.innerHTML = `
     <div class="ceremony-emoji">💐</div>
@@ -865,10 +959,86 @@ function tossBouquet() {
       <div class="ceremony-title">恭喜！${catcher} 接到了捧花！</div>
       <div style="font-size:60px;margin:20px 0;">${catcher} 💐</div>
       <div class="ceremony-text">下一个幸福的人就是你！</div>
-      <button class="action-btn" onclick="runStep(6)">📜 领取结婚证明</button>
+      
+      <!-- Share Section -->
+      <div class="share-section">
+        <div class="share-title">📤 把幸福传递给好友</div>
+        <input type="text" class="share-friend-input" id="shareFriendName" placeholder="输入好友名字（可选）" maxlength="8">
+        <div class="share-card" id="shareCard">
+          <div class="share-card-emoji">💒</div>
+          <div class="share-card-text">我刚在「婚礼进行时」体验了浪漫婚礼</div>
+          <div class="share-card-names">${state.brideName} ❤️ ${state.groomName}</div>
+          <div class="share-card-text">下一个幸福的人，就是你！</div>
+        </div>
+        <div class="share-tip">截图保存上方卡片，发给微信好友 💕</div>
+        <button class="share-btn-wechat" onclick="shareToWeChat()">💬 分享给微信好友</button>
+        <button class="share-btn-copy" onclick="copyLink()">📋 复制链接</button>
+      </div>
+      
+      <button class="action-btn" onclick="runStep(6)" style="margin-top:16px;">📜 领取结婚证明</button>
     `;
     createConfetti(['💐', '🌸', '🎊']);
   }, 1500);
+}
+
+// ===== WeChat Share =====
+function shareToWeChat() {
+  const friendName = document.getElementById('shareFriendName')?.value.trim();
+  if (friendName) {
+    updateShareCard(friendName);
+  }
+  
+  if (isWeChat) {
+    document.getElementById('wechatTip').classList.add('show');
+  } else if (navigator.share) {
+    navigator.share({
+      title: '婚礼进行时 - 浪漫模拟器',
+      text: `${state.brideName}和${state.groomName}的婚礼太浪漫了！快来体验吧～`,
+      url: window.location.href
+    }).catch(() => {});
+  } else {
+    showToast('请截图保存卡片，发给微信好友 💕');
+  }
+}
+
+function updateShareCard(friendName) {
+  const card = document.getElementById('shareCard');
+  if (card && friendName) {
+    card.innerHTML = `
+      <div class="share-card-emoji">💐</div>
+      <div class="share-card-text">亲爱的 ${friendName}</div>
+      <div class="share-card-names">${state.brideName} ❤️ ${state.groomName}</div>
+      <div class="share-card-text">的婚礼捧花传给了你！<br>下一个幸福的人，就是你！</div>
+    `;
+  }
+}
+
+function copyLink() {
+  const friendName = document.getElementById('shareFriendName')?.value.trim();
+  let url = window.location.href;
+  if (friendName) {
+    url += (url.includes('?') ? '&' : '?') + 'from=' + encodeURIComponent(state.brideName + '&' + state.groomName);
+  }
+  
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('链接已复制，快去微信粘贴发给好友吧！');
+    }).catch(() => {
+      fallbackCopy(url);
+    });
+  } else {
+    fallbackCopy(url);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showToast('链接已复制，快去微信粘贴发给好友吧！');
 }
 
 // Step 7: Wedding Certificate
@@ -876,7 +1046,6 @@ function renderCertificate(stage, scene) {
   const today = new Date();
   const dateStr = today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
   
-  // Save to localStorage
   const weddingData = {
     brideName: state.brideName,
     groomName: state.groomName,
@@ -905,7 +1074,7 @@ function renderCertificate(stage, scene) {
     </div>
 
     <div class="gift-shop">
-      <div class="gift-shop-title">🎁 为TA挑选一份周年礼物</div>
+      <div class="gift-shop-title">🎁 为TA送出一份礼物</div>
       <div class="gift-grid" id="giftGrid"></div>
     </div>
 
@@ -914,7 +1083,6 @@ function renderCertificate(stage, scene) {
     <button class="action-btn" onclick="exitWedding()" style="margin-top:12px;background:#e8e8e8;color:#666;box-shadow:none;">↩️ 重新举办</button>
   `;
 
-  // Render gifts
   const grid = document.getElementById('giftGrid');
   gifts.forEach((gift, i) => {
     const div = document.createElement('div');
