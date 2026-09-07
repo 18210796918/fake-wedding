@@ -812,6 +812,8 @@ function init() {
     }
   }
   
+  bindInputEvents();
+  checkReady();
   createPetals();
 }
 
@@ -835,8 +837,12 @@ function checkReady() {
   const groom = document.getElementById('groomName').value.trim();
   state.brideName = bride;
   state.groomName = groom;
-  const ready = bride && groom && state.scene;
-  document.getElementById('startBtn').disabled = !ready;
+  const ready = !!(bride && groom && state.scene);
+  const btn = document.getElementById('startBtn');
+  if (btn) {
+    btn.disabled = !ready;
+    btn.style.opacity = ready ? '1' : '0.6';
+  }
 }
 
 function selectScene(el) {
@@ -846,8 +852,21 @@ function selectScene(el) {
   checkReady();
 }
 
-document.getElementById('brideName').addEventListener('input', checkReady);
-document.getElementById('groomName').addEventListener('input', checkReady);
+// Bind events more robustly
+function bindInputEvents() {
+  const brideInput = document.getElementById('brideName');
+  const groomInput = document.getElementById('groomName');
+  if (brideInput) {
+    brideInput.addEventListener('input', checkReady);
+    brideInput.addEventListener('keyup', checkReady);
+    brideInput.addEventListener('change', checkReady);
+  }
+  if (groomInput) {
+    groomInput.addEventListener('input', checkReady);
+    groomInput.addEventListener('keyup', checkReady);
+    groomInput.addEventListener('change', checkReady);
+  }
+}
 
 // ===== Start Wedding =====
 function startWedding() {
