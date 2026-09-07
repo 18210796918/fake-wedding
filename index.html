@@ -524,7 +524,40 @@ body {
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
-/* ===== Toast ===== */
+/* ===== Certificate Canvas ===== */
+.cert-canvas-preview {
+  max-width: 340px;
+  margin: 16px auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+.cert-canvas-preview img {
+  width: 100%;
+  display: block;
+}
+
+/* ===== Gift Share ===== */
+.gift-share-section {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  max-width: 340px;
+  margin: 20px auto;
+  text-align: center;
+}
+.gift-share-card {
+  background: linear-gradient(135deg, #fff5f7 0%, #ffe4ec 100%);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 12px 0;
+  border: 2px dashed #ff9a9e;
+}
+.gift-share-emoji { font-size: 50px; margin-bottom: 8px; }
+.gift-share-title { font-size: 16px; font-weight: 700; color: #ff6b81; margin-bottom: 4px; }
+.gift-share-items { font-size: 14px; color: #5a3e4a; line-height: 1.8; margin: 8px 0; }
+.gift-share-from { font-size: 13px; color: #999; margin-top: 8px; }
 .toast {
   position: fixed;
   top: 20px;
@@ -1054,23 +1087,17 @@ function renderCertificate(stage, scene) {
   };
   localStorage.setItem('weddingData', JSON.stringify(weddingData));
 
+  // Generate canvas certificate image
+  const certCanvas = generateCertificateImage();
+  const certImgSrc = certCanvas.toDataURL('image/png');
+
   stage.innerHTML = `
     <div class="ceremony-emoji">📜</div>
     <div class="ceremony-title">Wedding Certificate</div>
     <div class="ceremony-text">恭喜 ${state.brideName} & ${state.groomName} 正式结为夫妻！</div>
     
-    <div class="certificate-card">
-      <div class="cert-title">结婚证明</div>
-      <div class="cert-subtitle">WEDDING CERTIFICATE</div>
-      <div style="font-size:30px;margin:12px 0;">⛪</div>
-      <div class="cert-names">${state.brideName}</div>
-      <div class="cert-heart">❤️</div>
-      <div class="cert-names">${state.groomName}</div>
-      <div style="width:60%;height:1px;background:#ffdde5;margin:16px auto;"></div>
-      <div class="cert-date">📅 结婚日期：${dateStr}</div>
-      <div class="cert-days">0</div>
-      <div class="cert-days-label">新婚快乐！</div>
-      <div class="cert-seal">生效<br>印章</div>
+    <div class="cert-canvas-preview">
+      <img src="${certImgSrc}" alt="结婚证明" style="width:100%;display:block;border-radius:12px;">
     </div>
 
     <div class="gift-shop">
@@ -1114,13 +1141,198 @@ function finishGiftSelection() {
     showToast('请先选择至少一件礼物送给TA～');
     return;
   }
-  const names = state.selectedGifts.map(i => gifts[i].name).join('、');
-  showToast(`已送出：${names}！祝你们幸福！💖`);
+  
+  const selectedNames = state.selectedGifts.map(i => gifts[i]);
+  const names = selectedNames.map(g => g.name).join('、');
+  
+  // Generate gift share card
+  const stage = document.getElementById('ceremonyStage');
+  stage.innerHTML = `
+    <div class="ceremony-emoji">🎁</div>
+    <div class="ceremony-title">礼物已送出！</div>
+    <div class="ceremony-text">你精心挑选的礼物，代表了满满的爱意～</div>
+    
+    <div class="gift-share-section">
+      <div class="gift-share-card" id="giftShareCard">
+        <div class="gift-share-emoji">💝</div>
+        <div class="gift-share-title">送给 ${state.brideName} & ${state.groomName}</div>
+        <div class="gift-share-items">
+          ${selectedNames.map(g => `${g.emoji} ${g.name} ${g.price}`).join('<br>')}
+        </div>
+        <div class="gift-share-from">— 来自「婚礼进行时」</div>
+      </div>
+      <div class="share-tip">截图保存卡片，发给微信好友 💕</div>
+      <button class="share-btn-wechat" onclick="shareGiftsToWeChat()">💬 微信转发给TA</button>
+      <button class="share-btn-copy" onclick="shareGiftsCopy()">📋 复制礼物清单</button>
+    </div>
+    
+    <button class="action-btn" onclick="runStep(6)" style="margin-top:16px;">📜 返回结婚证明</button>
+  `;
+  
   createConfetti(['🎁', '💖', '💝', '🌸']);
 }
 
+function shareGiftsToWeChat() {
+  if (isWeChat) {
+    document.getElementById('wechatTip').classList.add('show');
+  } else if (navigator.share) {
+    const selectedNames = state.selectedGifts.map(i => gifts[i]);
+    navigator.share({
+      title: '送你一份礼物 💝',
+      text: `${state.brideName} & ${state.groomName} 收到了：${selectedNames.map(g => g.name).join('、')}`,
+      url: window.location.href
+    }).catch(() => {});
+  } else {
+    showToast('请截图保存礼物卡片，发给微信好友 💕');
+  }
+}
+
+function shareGiftsCopy() {
+  const selectedNames = state.selectedGifts.map(i => gifts[i]);
+  const text = `💝 送给 ${state.brideName} & ${state.groomName} 的礼物清单：\n${selectedNames.map(g => `${g.emoji} ${g.name} ${g.price}`).join('\n')}\n\n来自「婚礼进行时」浪漫模拟器`;
+  
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('礼物清单已复制，快去微信发给TA吧！');
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+// ===== Canvas Certificate Generation =====
+function generateCertificateImage() {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const w = 800;
+  const h = 1100;
+  canvas.width = w;
+  canvas.height = h;
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#fff5f7');
+  grad.addColorStop(0.5, '#ffe4ec');
+  grad.addColorStop(1, '#ffdde5');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Decorative border
+  ctx.strokeStyle = '#ff9a9e';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(30, 30, w - 60, h - 60);
+  
+  ctx.strokeStyle = '#ffdde5';
+  ctx.setLineDash([15, 10]);
+  ctx.lineWidth = 2;
+  ctx.strokeRect(50, 50, w - 100, h - 100);
+  ctx.setLineDash([]);
+
+  // Title
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ff6b81';
+  ctx.font = 'bold 48px Arial';
+  ctx.fillText('结婚证明', w / 2, 130);
+  
+  ctx.fillStyle = '#999';
+  ctx.font = '18px Arial';
+  ctx.letterSpacing = '8px';
+  ctx.fillText('WEDDING CERTIFICATE', w / 2, 165);
+
+  // Church icon
+  ctx.font = '80px Arial';
+  ctx.fillText('⛪', w / 2, 260);
+
+  // Names
+  ctx.fillStyle = '#5a3e4a';
+  ctx.font = 'bold 42px Arial';
+  ctx.fillText(state.brideName, w / 2, 340);
+  
+  ctx.fillStyle = '#ff6b81';
+  ctx.font = '50px Arial';
+  ctx.fillText('❤️', w / 2, 400);
+  
+  ctx.fillStyle = '#5a3e4a';
+  ctx.font = 'bold 42px Arial';
+  ctx.fillText(state.groomName, w / 2, 460);
+
+  // Divider
+  ctx.strokeStyle = '#ffdde5';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(200, 510);
+  ctx.lineTo(600, 510);
+  ctx.stroke();
+
+  // Date
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+  ctx.fillStyle = '#8b6f7a';
+  ctx.font = '26px Arial';
+  ctx.fillText('📅 结婚日期：' + dateStr, w / 2, 560);
+
+  // Blessing
+  ctx.fillStyle = '#5a3e4a';
+  ctx.font = 'italic 28px Arial';
+  ctx.fillText('愿有岁月可回首', w / 2, 640);
+  ctx.fillText('且以深情共白头', w / 2, 680);
+
+  // Seal
+  ctx.save();
+  ctx.translate(w / 2 + 220, 780);
+  ctx.rotate(-15 * Math.PI / 180);
+  ctx.fillStyle = '#ff6b81';
+  ctx.beginPath();
+  ctx.arc(0, 0, 50, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = '#ff9a9e';
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 16px Arial';
+  ctx.fillText('生效', 0, -5);
+  ctx.fillText('印章', 0, 15);
+  ctx.restore();
+
+  // Footer decorations
+  const decorations = ['🌸', '💖', '💐', '✨', '🎊'];
+  ctx.font = '36px Arial';
+  decorations.forEach((d, i) => {
+    ctx.fillText(d, 120 + i * 140, h - 80);
+  });
+
+  // Footer text
+  ctx.fillStyle = '#999';
+  ctx.font = '18px Arial';
+  ctx.fillText('婚礼进行时 - 浪漫模拟器', w / 2, h - 30);
+
+  return canvas;
+}
+
 function downloadCertificate() {
-  showToast('结婚证明已保存到相册！');
+  const canvas = generateCertificateImage();
+  const link = document.createElement('a');
+  link.download = `结婚证明_${state.brideName}_${state.groomName}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('结婚证明已下载到相册！');
+}
+
+function showCertificatePreview() {
+  const canvas = generateCertificateImage();
+  const img = document.createElement('img');
+  img.src = canvas.toDataURL('image/png');
+  img.style.maxWidth = '100%';
+  img.style.borderRadius = '12px';
+  
+  const preview = document.createElement('div');
+  preview.className = 'cert-canvas-preview';
+  preview.appendChild(img);
+  
+  const certCard = document.querySelector('.certificate-card');
+  if (certCard) {
+    certCard.parentNode.insertBefore(preview, certCard.nextSibling);
+  }
 }
 
 // ===== Confetti =====
