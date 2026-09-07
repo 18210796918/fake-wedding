@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>假装举行婚礼 - 浪漫模拟器</title>
+<title>婚礼进行时 - 浪漫模拟器</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -659,7 +659,7 @@ body {
   <!-- Header -->
   <div class="header">
     <div class="header-icon">💒</div>
-    <h1>假装举行婚礼</h1>
+    <h1>婚礼进行时</h1>
     <p>为新人打造一场完美的浪漫仪式</p>
   </div>
 
@@ -790,7 +790,7 @@ let state = {
   groom: '',
   scene: null,
   step: 0,
-  totalSteps: 6,
+  totalSteps: 7,
   wishes: [],
   photos: []
 };
@@ -844,7 +844,7 @@ function exitWedding() {
 function updateProgress(step) {
   const pct = ((step + 1) / state.totalSteps) * 100;
   document.getElementById('progressFill').style.width = pct + '%';
-  const labels = ['新人入场', '宣读誓言', '交换戒指', '深情拥吻', '抛捧花', '婚礼圆满'];
+  const labels = ['新人入场', '宣读誓言', '交换戒指', '深情拥吻', '亲友祝福', '抛捧花', '婚礼圆满'];
   document.getElementById('progressText').textContent = labels[step] || '完成';
 }
 
@@ -860,8 +860,9 @@ function runStep(step) {
     case 1: renderVows(stage, scene); break;
     case 2: renderRings(stage, scene); break;
     case 3: renderKiss(stage, scene); break;
-    case 4: renderBouquet(stage, scene); break;
-    case 5: renderFinish(stage, scene); break;
+    case 4: renderBlessings(stage, scene); break;
+    case 5: renderBouquet(stage, scene); break;
+    case 6: renderFinish(stage, scene); break;
   }
 }
 
@@ -965,7 +966,60 @@ function doKiss() {
   setTimeout(() => runStep(4), 3000);
 }
 
-// Step 5: Bouquet Toss
+// Step 5: Blessings from family & friends
+function renderBlessings(stage, scene) {
+  const familyWishes = [
+    { from: '👨‍👩‍👧 新娘父母', msg: '孩子们，从今天起你们就是一家人了。愿你们互相扶持，白头到老。' },
+    { from: '👨‍👩‍👦 新郎父母', msg: '我们把最珍贵的宝贝交给你，请你用一生去爱她、呵护她。' },
+    { from: '👵 奶奶/外婆', msg: '看到你们喜结良缘，奶奶心里比吃了蜜还甜。早生贵子啊！' },
+    { from: '👴 爷爷/外公', msg: '婚姻是两个人一起走过的路，有平坦也有坎坷，但只要心在一起，就没有过不去的坎。' }
+  ];
+  const friendWishes = [
+    { from: '👭 闺蜜团', msg: '终于等到这一天！你穿上婚纱的样子美哭了，要永远幸福下去！' },
+    { from: '👬 兄弟团', msg: '兄弟，以后就是两个人了，记得多顾家！祝你们百年好合！' },
+    { from: '👩‍💼 同事代表', msg: '恭喜二位！愿你们的爱情像公司的业绩一样，节节高升！' },
+    { from: '🧑‍🤝‍🧑 远方好友', msg: '虽然没能到场，但我的心与你们同在。祝新婚快乐，永远甜蜜！' }
+  ];
+
+  const randomFamily = familyWishes[Math.floor(Math.random() * familyWishes.length)];
+  const randomFriend = friendWishes[Math.floor(Math.random() * friendWishes.length)];
+
+  stage.innerHTML = `
+    <div class="ceremony-emoji">🎤</div>
+    <div class="ceremony-title">亲友祝福环节</div>
+    <div class="ceremony-text">在这个特别的时刻，听听家人和朋友最真挚的祝福。</div>
+    
+    <div class="vow-area" style="margin:12px 0;text-align:left;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="font-size:28px;">${randomFamily.from.split(' ')[0]}</span>
+        <span style="font-size:13px;color:#999;font-weight:600;">${randomFamily.from.split(' ')[1]}</span>
+      </div>
+      <div class="vow-text" style="font-size:14px;">${randomFamily.msg}</div>
+    </div>
+    
+    <div class="vow-area" style="margin:12px 0;text-align:left;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span style="font-size:28px;">${randomFriend.from.split(' ')[0]}</span>
+        <span style="font-size:13px;color:#999;font-weight:600;">${randomFriend.from.split(' ')[1]}</span>
+      </div>
+      <div class="vow-text" style="font-size:14px;">${randomFriend.msg}</div>
+    </div>
+    
+    <div style="margin:16px 0;">
+      <div style="font-size:13px;color:#8b6f7a;margin-bottom:8px;">💬 在场宾客齐声祝福</div>
+      <div class="wish-bubbles">
+        ${guestWishes.slice(0, 8).map(w => `<span class="wish-bubble">${w}</span>`).join('')}
+      </div>
+    </div>
+    
+    <button class="action-btn" onclick="runStep(5)">
+      💐 继续 — 抛捧花
+    </button>
+  `;
+  createConfetti(['🎊', '💐', '🌸', '✨']);
+}
+
+// Step 6: Bouquet Toss
 function renderBouquet(stage, scene) {
   stage.innerHTML = `
     <div class="ceremony-emoji">💐</div>
@@ -989,7 +1043,7 @@ function tossBouquet() {
       <div class="ceremony-title">恭喜！${catcher} 接到了捧花！</div>
       <div style="font-size:60px;margin:20px 0;">${catcher} 💐</div>
       <div class="ceremony-text">下一个幸福的人就是你！</div>
-      <button class="action-btn" onclick="runStep(5)">
+      <button class="action-btn" onclick="runStep(6)">
         🎊 婚礼圆满
       </button>
     `;
@@ -1012,7 +1066,7 @@ function renderFinish(stage, scene) {
           <div class="stat-label">宾客祝福</div>
         </div>
         <div class="stat-item">
-          <div class="stat-num">6</div>
+          <div class="stat-num">7</div>
           <div class="stat-label">仪式环节</div>
         </div>
         <div class="stat-item">
@@ -1067,7 +1121,7 @@ function createConfetti(emojis) {
 function shareWedding() {
   const text = `💒 喜讯！${state.bride} ❤️ ${state.groom} 在${scenes[state.scene].name}举行了完美的婚礼！快来送上你的祝福吧～`;
   if (navigator.share) {
-    navigator.share({ title: '假装举行婚礼', text: text, url: window.location.href });
+    navigator.share({ title: '婚礼进行时', text: text, url: window.location.href });
   } else {
     copyToClipboard(window.location.href);
     showToast('链接已复制，快去分享喜讯吧！');
