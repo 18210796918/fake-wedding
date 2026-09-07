@@ -524,7 +524,43 @@ body {
   100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 }
 
-/* ===== Certificate Canvas ===== */
+/* ===== Chinese Bride ===== */
+.chinese-bride {
+  display: inline-block;
+  position: relative;
+  font-size: 50px;
+  line-height: 1;
+}
+.chinese-bride .veil {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 36px;
+  background: linear-gradient(180deg, #c62828 0%, #b71c1c 60%, transparent 100%);
+  border-radius: 50% 50% 40% 40%;
+  opacity: 0.85;
+  pointer-events: none;
+}
+.chinese-bride .face {
+  position: relative;
+  z-index: 2;
+  font-size: 36px;
+  display: inline-block;
+  margin-top: 8px;
+}
+.chinese-bride .decor {
+  position: absolute;
+  bottom: -4px;
+  right: -8px;
+  font-size: 16px;
+  z-index: 3;
+}
+.chinese-bride-small { font-size: 36px; }
+.chinese-bride-small .veil { width: 42px; height: 28px; }
+.chinese-bride-small .face { font-size: 28px; margin-top: 4px; }
+.chinese-bride-small .decor { font-size: 12px; bottom: -2px; right: -6px; }
 .cert-canvas-preview {
   max-width: 340px;
   margin: 16px auto;
@@ -675,8 +711,17 @@ const sceneChars = {
   church: { bride: '👰‍♀️', groom: '🤵‍♂️', labelB: '新娘', labelG: '新郎' },
   garden: { bride: '👰‍♀️', groom: '🤵‍♂️', labelB: '新娘', labelG: '新郎' },
   island: { bride: '👰‍♀️', groom: '🤵‍♂️', labelB: '新娘', labelG: '新郎' },
-  chinese: { bride: '👰', groom: '👲', labelB: '新娘', labelG: '新郎' }
+  chinese: { bride: 'chinese', groom: '👲', labelB: '新娘', labelG: '新郎' }
 };
+
+function getBrideHTML(size = '') {
+  const cls = size === 'small' ? 'chinese-bride chinese-bride-small' : 'chinese-bride';
+  return `<span class="${cls}"><span class="veil"></span><span class="face">👩</span><span class="decor">🧧</span></span>`;
+}
+function getBrideEmoji(scene, size = '') {
+  if (scene === 'chinese') return getBrideHTML(size);
+  return sceneChars[scene].bride;
+}
 
 // ===== Data =====
 const scenes = {
@@ -853,11 +898,14 @@ function runStep(step) {
 // Step 1: Entrance
 function renderEntrance(stage, scene) {
   const chars = sceneChars[state.scene];
+  const brideDisplay = getBrideEmoji(state.scene);
   stage.innerHTML = `
     <div class="ceremony-emoji">${scene.emoji}</div>
     <div class="ceremony-title">欢迎参加这场浪漫婚礼</div>
     <div class="ceremony-text">${scene.intro}</div>
-    <div style="font-size:60px;margin:16px 0;">${chars.bride} ❤️ ${chars.groom}</div>
+    <div style="font-size:60px;margin:16px 0;display:flex;align-items:center;justify-content:center;gap:12px;">
+      ${brideDisplay} <span>❤️</span> <span style="font-size:50px;">${chars.groom}</span>
+    </div>
     <div style="font-size:18px;font-weight:700;color:#5a3e4a;margin-bottom:24px;">${state.brideName} & ${state.groomName}</div>
     <button class="action-btn" onclick="runStep(1)">🎵 新人入场</button>
   `;
@@ -868,11 +916,12 @@ function renderEntrance(stage, scene) {
 function renderVows(stage, scene) {
   const vow = vows[Math.floor(Math.random() * vows.length)];
   const chars = sceneChars[state.scene];
+  const brideEmoji = getBrideEmoji(state.scene, 'small');
   stage.innerHTML = `
     <div class="ceremony-emoji">💌</div>
     <div class="ceremony-title">宣读爱的誓言</div>
     <div style="display:flex;align-items:center;gap:12px;margin:16px 0;width:100%;max-width:360px;">
-      <span style="font-size:40px;">${chars.bride}</span>
+      <span style="font-size:40px;display:flex;align-items:center;justify-content:center;width:50px;">${brideEmoji}</span>
       <div class="vow-area" style="flex:1;margin:0;">
         <div class="vow-label">${state.brideName} 的誓言</div>
         <div class="vow-text">${vow.bride}</div>
@@ -892,11 +941,16 @@ function renderVows(stage, scene) {
 // Step 3: Rings
 function renderRings(stage, scene) {
   const chars = sceneChars[state.scene];
+  const brideEmoji = getBrideEmoji(state.scene);
   stage.innerHTML = `
     <div class="ceremony-emoji">💍</div>
     <div class="ceremony-title">交换爱的信物</div>
     <div class="ceremony-text">戒指是圆的，没有起点也没有终点，象征永恒的爱。</div>
-    <div style="font-size:50px;margin:12px 0;">${chars.bride} 💍 ${chars.groom}</div>
+    <div style="font-size:50px;margin:12px 0;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span style="display:flex;align-items:center;">${brideEmoji}</span>
+      <span>💍</span>
+      <span style="font-size:50px;">${chars.groom}</span>
+    </div>
     <div class="ring-container" id="ringContainer">
       <div class="ring ring-left" id="ringLeft">💍</div>
       <div class="ring ring-right" id="ringRight">💍</div>
@@ -1143,7 +1197,6 @@ function finishGiftSelection() {
   }
   
   const selectedNames = state.selectedGifts.map(i => gifts[i]);
-  const names = selectedNames.map(g => g.name).join('、');
   
   // Generate gift share card
   const stage = document.getElementById('ceremonyStage');
@@ -1153,13 +1206,15 @@ function finishGiftSelection() {
     <div class="ceremony-text">你精心挑选的礼物，代表了满满的爱意～</div>
     
     <div class="gift-share-section">
+      <div class="share-title">💬 选择微信好友，一对一送出</div>
+      <input type="text" class="share-friend-input" id="giftFriendName" placeholder="输入好友名字" maxlength="8" oninput="updateGiftShareCard()">
       <div class="gift-share-card" id="giftShareCard">
         <div class="gift-share-emoji">💝</div>
-        <div class="gift-share-title">送给 ${state.brideName} & ${state.groomName}</div>
+        <div class="gift-share-title" id="giftCardTitle">送给 ${state.brideName} & ${state.groomName}</div>
         <div class="gift-share-items">
           ${selectedNames.map(g => `${g.emoji} ${g.name} ${g.price}`).join('<br>')}
         </div>
-        <div class="gift-share-from">— 来自「婚礼进行时」</div>
+        <div class="gift-share-from">— 来自 ${state.brideName} & ${state.groomName} 的婚礼</div>
       </div>
       <div class="share-tip">截图保存卡片，发给微信好友 💕</div>
       <button class="share-btn-wechat" onclick="shareGiftsToWeChat()">💬 微信转发给TA</button>
@@ -1172,27 +1227,69 @@ function finishGiftSelection() {
   createConfetti(['🎁', '💖', '💝', '🌸']);
 }
 
+function updateGiftShareCard() {
+  const friendName = document.getElementById('giftFriendName')?.value.trim();
+  const titleEl = document.getElementById('giftCardTitle');
+  if (titleEl && friendName) {
+    titleEl.textContent = `亲爱的 ${friendName}，这份礼物送给你`;
+  } else if (titleEl) {
+    titleEl.textContent = `送给 ${state.brideName} & ${state.groomName}`;
+  }
+}
+
 function shareGiftsToWeChat() {
+  const friendName = document.getElementById('giftFriendName')?.value.trim();
+  
+  if (!friendName) {
+    showToast('请先输入好友名字～');
+    document.getElementById('giftFriendName')?.focus();
+    return;
+  }
+  
+  updateGiftShareCard();
+  
   if (isWeChat) {
-    document.getElementById('wechatTip').classList.add('show');
+    // Show custom tip for one-to-one sharing
+    const tip = document.getElementById('wechatTip');
+    if (tip) {
+      tip.innerHTML = `
+        <div class="wechat-tip-arrow">👆</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:12px;">点击右上角菜单</div>
+        <div style="font-size:14px;opacity:0.9;">选择「发送给朋友」<br>把这份礼物送给 ${friendName} 💕</div>
+      `;
+      tip.classList.add('show');
+    }
   } else if (navigator.share) {
     const selectedNames = state.selectedGifts.map(i => gifts[i]);
     navigator.share({
-      title: '送你一份礼物 💝',
-      text: `${state.brideName} & ${state.groomName} 收到了：${selectedNames.map(g => g.name).join('、')}`,
+      title: `送你一份礼物 💝`,
+      text: `亲爱的${friendName}，${state.brideName}和${state.groomName}为你准备了：${selectedNames.map(g => g.name).join('、')}。来自他们的婚礼～`,
       url: window.location.href
     }).catch(() => {});
   } else {
-    showToast('请截图保存礼物卡片，发给微信好友 💕');
+    showToast(`请截图保存礼物卡片，微信发给 ${friendName} 💕`);
   }
 }
 
 function shareGiftsCopy() {
+  const friendName = document.getElementById('giftFriendName')?.value.trim();
   const selectedNames = state.selectedGifts.map(i => gifts[i]);
-  const text = `💝 送给 ${state.brideName} & ${state.groomName} 的礼物清单：\n${selectedNames.map(g => `${g.emoji} ${g.name} ${g.price}`).join('\n')}\n\n来自「婚礼进行时」浪漫模拟器`;
+  
+  let text;
+  if (friendName) {
+    text = `亲爱的${friendName}：\n\n${state.brideName} & ${state.groomName} 在他们的婚礼上为你准备了这份礼物：\n\n${selectedNames.map(g => `${g.emoji} ${g.name} ${g.price}`).join('\n')}\n\n— 来自 ${state.brideName} & ${state.groomName} 的婚礼 💝`;
+  } else {
+    text = `💝 来自 ${state.brideName} & ${state.groomName} 的婚礼礼物：\n\n${selectedNames.map(g => `${g.emoji} ${g.name} ${g.price}`).join('\n')}`;
+  }
   
   if (navigator.clipboard) {
     navigator.clipboard.writeText(text).then(() => {
+      showToast(friendName ? `礼物清单已复制，快去微信发给${friendName}吧！` : '礼物清单已复制！');
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
       showToast('礼物清单已复制，快去微信发给TA吧！');
     }).catch(() => fallbackCopy(text));
   } else {
