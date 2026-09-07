@@ -719,8 +719,9 @@ function getBrideHTML(size = '') {
   return `<span class="${cls}"><span class="veil"></span><span class="face">👩</span><span class="decor">🧧</span></span>`;
 }
 function getBrideEmoji(scene, size = '') {
-  if (scene === 'chinese') return getBrideHTML(size);
-  return sceneChars[scene].bride;
+  const isChinese = state.scene === 'chinese';
+  if (isChinese) return getBrideHTML(size);
+  return sceneChars[state.scene]?.bride || '👰‍♀️';
 }
 
 // ===== Data =====
