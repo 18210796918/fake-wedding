@@ -646,7 +646,7 @@ body {
   <!-- Scene Selection -->
   <div class="section-title">🏛️ 选择婚礼场景</div>
   <div class="scene-grid">
-    <div class="scene-card" data-scene="church">
+    <div class="scene-card" data-scene="church" onclick="selectScene(this)">
       <div class="scene-preview scene-church">⛪</div>
       <div class="scene-info">
         <div class="scene-name">神圣教堂</div>
@@ -654,7 +654,7 @@ body {
       </div>
       <div class="scene-check">✓</div>
     </div>
-    <div class="scene-card" data-scene="garden">
+    <div class="scene-card" data-scene="garden" onclick="selectScene(this)">
       <div class="scene-preview scene-garden">🌿</div>
       <div class="scene-info">
         <div class="scene-name">浪漫草坪</div>
@@ -662,7 +662,7 @@ body {
       </div>
       <div class="scene-check">✓</div>
     </div>
-    <div class="scene-card" data-scene="island">
+    <div class="scene-card" data-scene="island" onclick="selectScene(this)">
       <div class="scene-preview scene-island">🏝️</div>
       <div class="scene-info">
         <div class="scene-name">梦幻海岛</div>
@@ -670,7 +670,7 @@ body {
       </div>
       <div class="scene-check">✓</div>
     </div>
-    <div class="scene-card" data-scene="chinese">
+    <div class="scene-card" data-scene="chinese" onclick="selectScene(this)">
       <div class="scene-preview scene-chinese">🏮</div>
       <div class="scene-info">
         <div class="scene-name">新中式</div>
@@ -680,7 +680,7 @@ body {
     </div>
   </div>
 
-  <button class="start-btn" id="startBtn" disabled>
+  <button class="start-btn" id="startBtn" onclick="handleStartClick()" disabled>
     💍 开始举行婚礼
   </button>
 </div>
@@ -852,56 +852,18 @@ function selectScene(el) {
   checkReady();
 }
 
-// Bind events more robustly
+// Bind events for input fields only
 function bindInputEvents() {
   const brideInput = document.getElementById('brideName');
   const groomInput = document.getElementById('groomName');
   
-  const events = ['input', 'keyup', 'change', 'blur', 'compositionend'];
-  
   if (brideInput) {
-    events.forEach(evt => brideInput.addEventListener(evt, checkReady));
-    // Handle WeChat input method composition
-    brideInput.addEventListener('compositionstart', () => { brideInput._composing = true; });
-    brideInput.addEventListener('compositionend', () => { brideInput._composing = false; checkReady(); });
+    brideInput.addEventListener('input', checkReady);
+    brideInput.addEventListener('compositionend', checkReady);
   }
   if (groomInput) {
-    events.forEach(evt => groomInput.addEventListener(evt, checkReady));
-    groomInput.addEventListener('compositionstart', () => { groomInput._composing = true; });
-    groomInput.addEventListener('compositionend', () => { groomInput._composing = false; checkReady(); });
-  }
-
-  // Scene cards - bind both click and touchend for mobile/WeChat
-  document.querySelectorAll('.scene-card').forEach(card => {
-    card.addEventListener('click', function(e) {
-      e.preventDefault();
-      selectScene(this);
-    });
-    card.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      selectScene(this);
-    });
-  });
-
-  // Start button - bind both click and touchend
-  const startBtn = document.getElementById('startBtn');
-  if (startBtn) {
-    startBtn.addEventListener('click', function(e) {
-      if (this.disabled) {
-        e.preventDefault();
-        showDisabledReason();
-        return;
-      }
-      startWedding();
-    });
-    startBtn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      if (this.disabled) {
-        showDisabledReason();
-        return;
-      }
-      startWedding();
-    });
+    groomInput.addEventListener('input', checkReady);
+    groomInput.addEventListener('compositionend', checkReady);
   }
 }
 
@@ -920,6 +882,14 @@ function showDisabledReason() {
   } else if (!state.scene) {
     showToast('请选择一个婚礼场景 🏛️');
   }
+}
+
+function handleStartClick() {
+  if (document.getElementById('startBtn').disabled) {
+    showDisabledReason();
+    return;
+  }
+  startWedding();
 }
 
 // ===== Start Wedding =====
